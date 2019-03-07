@@ -5,15 +5,12 @@ import {
   createGetCurrency
 } from '../src';
 
-const currencies = {
-  DAI: createCurrency('DAI'),
-  MKR: createCurrency('MKR'),
-  ETH: createCurrency('ETH'),
-  PETH: createCurrency('PETH'),
-  WETH: createCurrency('WETH'),
-  USD: createCurrency('USD')
-};
-const { DAI, MKR, ETH, PETH, WETH, USD } = currencies;
+const DAI = createCurrency('DAI');
+const MKR = createCurrency('MKR');
+const ETH = createCurrency('ETH');
+const PETH = createCurrency('PETH');
+const WETH = createCurrency('WETH');
+const USD = createCurrency('USD');
 const USD_DAI = createCurrencyRatio(USD, DAI);
 
 test('short syntax', () => {
@@ -30,20 +27,20 @@ test('optional shift argument', () => {
 
 test('short syntax for wei (1e18) amounts', () => {
   const n = MKR.wei('2110000000000000000');
-  expect(n.toString()).toBe('2.11 MKR');
+  expect(n).toEqual(MKR(2.11));
 });
 
 test('short syntax for ray (1e27) amounts', () => {
   const n = PETH.ray('5130000000000000000000000000');
-  expect(n.toString()).toBe('5.13 PETH');
+  expect(n).toEqual(PETH(5.13));
 });
 
 test('short syntax for rad (1e45) amounts', () => {
   const n = PETH.rad('1470000000000000000000000000000000000000000000');
-  expect(n.toString()).toBe('1.47 PETH');
+  expect(n).toEqual(PETH(1.47));
 });
 
-test('prints the specified number of decimals', () => {
+test('toString prints the specified number of decimals', () => {
   const n = MKR('1000.5447123');
   expect(n.toString(3)).toBe('1000.545 MKR');
 });
@@ -62,24 +59,22 @@ test('comparisons', () => {
 });
 
 test('prevent math on mismatched types', () => {
-  const a = MKR('1.2');
-  const b = DAI('3.4');
   expect(() => {
-    a.plus(b);
+    MKR(1).plus(DAI(1));
   }).toThrow('Invalid operation: MKR plus DAI');
 
   expect(() => {
-    a.times(USD_DAI(3));
-  }).toThrow('Invalid operation: MKR times USD/DAI');
+    USD(1).times(USD_DAI(2));
+  }).toThrow('Invalid operation: USD times USD/DAI');
 
   expect(() => {
-    b.div(USD_DAI(3));
+    DAI(4).div(USD_DAI(2));
   }).toThrow('Invalid operation: DAI div USD/DAI');
 });
 
 test('equality of different instances', () => {
   expect(MKR('2').isEqual(MKR('2'))).toBeTruthy();
-  expect(MKR('2')).toEqual(MKR('2'));
+  expect(MKR(2)).toEqual(MKR('2'));
   expect(MKR('2')).not.toEqual(MKR('2.1'));
   expect(MKR('2')).not.toEqual(DAI('2'));
 });
@@ -93,11 +88,11 @@ test('convert to fixed-point string with optional shifting', () => {
     '5000000000000000000000000000000000000000000000'
   );
 
-  // round amounts smaller than 1 wei -- always round down
+  // always round down amounts smaller than 1 wei
   expect(DAI.wei(1.5).toFixed('wei')).toEqual('1');
 });
 
-test('wrap BigNumber methods', () => {
+test('wrap some BigNumber methods', () => {
   expect(DAI(4).shiftedBy(2)).toEqual(DAI(400));
 });
 
@@ -150,7 +145,7 @@ describe('getCurrency', () => {
   let getCurrency;
 
   beforeAll(() => {
-    getCurrency = createGetCurrency(currencies);
+    getCurrency = createGetCurrency({ DAI, MKR, ETH, PETH, WETH, USD });
   });
 
   test('passes through Currency instance', () => {
