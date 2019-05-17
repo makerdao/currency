@@ -123,6 +123,11 @@ test('creating a ratio from division', () => {
   expect(value1.div(value2)).toEqual(USD_DAI(0.2));
 });
 
+test('basic math with ratios', () => {
+  const val = USD_DAI(10);
+  expect(val.times(10)).toEqual(USD_DAI(100));
+});
+
 test('instanceof Currency', () => {
   expect(ETH(5) instanceof Currency).toBeTruthy();
 });

@@ -103,7 +103,7 @@ function assertValidOperation(method, left, right) {
     switch (method) {
       // division between two different units results in a ratio, e.g. USD/DAI
       case 'div':
-      return;
+        return;
     }
   }
 
@@ -121,6 +121,14 @@ function bigNumberFnResult(method, left, right, value) {
   }
 
   if (!(right instanceof Currency) || left.isSameType(right)) {
+    if (left instanceof CurrencyRatio) {
+      return new left.constructor(
+        value,
+        left.numerator,
+        left.denominator,
+        left.shift
+      );
+    }
     return new left.constructor(value);
   }
 

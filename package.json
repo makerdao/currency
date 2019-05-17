@@ -1,13 +1,21 @@
 {
   "name": "@makerdao/currency",
   "description": "Utilities for working with currency amounts",
-  "version": "0.9.3",
+  "version": "0.9.5",
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
     "prepublishOnly": "babel -d dist src",
     "test": "jest"
   },
+  "files": [
+    "package.json",
+    "README.md",
+    "LICENSE",
+    "src/**/*.js",
+    "dist/**/*.js",
+    "test/**/*.js"
+  ],
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-jest": "^22.4.3",
