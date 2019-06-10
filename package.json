@@ -1,7 +1,7 @@
 {
   "name": "@makerdao/currency",
   "description": "Utilities for working with currency amounts",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
