@@ -84,7 +84,11 @@ const booleanFunctions = [
 ];
 
 function assertValidOperation(method, left, right) {
-  const message = `Invalid operation: ${left.symbol} ${method} ${right.symbol}`;
+  if (!right && right !== 0) {
+    throw new Error(
+      `Invalid operation: ${left.symbol} ${method} with no right operand`
+    );
+  }
 
   if (!(right instanceof Currency) || left.isSameType(right)) return;
 
@@ -107,7 +111,9 @@ function assertValidOperation(method, left, right) {
     }
   }
 
-  throw new Error(message);
+  throw new Error(
+    `Invalid operation: ${left.symbol} ${method} ${right.symbol}`
+  );
 }
 
 function bigNumberFnResult(method, left, right, value) {
