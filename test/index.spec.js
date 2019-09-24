@@ -117,6 +117,11 @@ test('dividing by a ratio', () => {
   expect(value1.div(value2)).toEqual(DAI(5));
 });
 
+test('dividing by 0 = Infinity', () => {
+  expect(USD(10).div(0)).toEqual(USD(Infinity));
+  expect(USD(10).div(DAI(0))).toEqual(USD_DAI(Infinity));
+});
+
 test('creating a ratio from division', () => {
   const value1 = USD(4);
   const value2 = DAI(20);
