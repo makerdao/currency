@@ -68,9 +68,9 @@ export class CurrencyRatio extends Currency {
 }
 
 const mathFunctions = [
-  ['plus'],
-  ['minus'],
-  ['times', 'multipliedBy'],
+  ['plus', 'add'],
+  ['minus', 'sub'],
+  ['times', 'multipliedBy', 'mul'],
   ['div', 'dividedBy'],
   ['shiftedBy']
 ];
