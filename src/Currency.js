@@ -1,7 +1,9 @@
 import BigNumber from 'bignumber.js';
 
 function amountToBigNumber(amount) {
-  if (amount instanceof Currency) return amount.toBigNumber();
+  if (amount instanceof Currency || typeof amount.toBigNumber === 'function')
+    return amount.toBigNumber();
+
   const value = BigNumber(amount);
   if (value.lt(0)) throw new Error('amount cannot be negative');
   if (value.isNaN()) throw new Error(`amount "${amount}" is not a number`);
@@ -142,7 +144,7 @@ function bigNumberFnResult(method, left, right, value) {
 }
 
 function bigNumberFnWrapper(method, isBoolean) {
-  return function(other) {
+  return function (other) {
     assertValidOperation(method, this, other);
 
     const otherBigNumber =
