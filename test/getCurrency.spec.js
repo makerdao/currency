@@ -58,12 +58,6 @@ test('throws an error if there is no unit', () => {
   }).toThrowError('Amount is not a Currency');
 });
 
-test('throws an error if amount is negative', () => {
-  expect(() => {
-    getCurrency('-1', 'eth');
-  }).toThrowError('amount cannot be negative');
-});
-
 test('throws an error if symbol is unrecognized', () => {
   expect(() => {
     getCurrency(1, 'foo');

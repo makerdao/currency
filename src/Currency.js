@@ -5,7 +5,6 @@ function amountToBigNumber(amount) {
     return amount.toBigNumber();
 
   const value = BigNumber(amount);
-  if (value.lt(0)) throw new Error('amount cannot be negative');
   if (value.isNaN()) throw new Error(`amount "${amount}" is not a number`);
   return value;
 }
