@@ -1,4 +1,5 @@
 import { Currency, createCurrency, createCurrencyRatio } from '../src';
+import BigNumber from 'bignumber.js';
 
 const DAI = createCurrency('DAI');
 const MKR = createCurrency('MKR');
@@ -144,4 +145,9 @@ test('instance.type = short syntax creator', () => {
   const val = ETH(1);
   const val2 = val.type(1);
   expect(val2).toEqual(val);
+});
+
+test('constructor flexibility', () => {
+  const val = ETH({ toBigNumber: () => BigNumber(5) });
+  expect(val.eq(5)).toBeTruthy();
 });
