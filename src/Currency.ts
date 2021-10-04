@@ -4,20 +4,35 @@ function amountToBigNumber(amount) {
   if (amount instanceof Currency || typeof amount.toBigNumber === 'function')
     return amount.toBigNumber();
 
-  const value = BigNumber(amount);
+  const value = new BigNumber(amount);
   if (value.isNaN()) throw new Error(`amount "${amount}" is not a number`);
   return value;
 }
 
-export class Currency {
-  constructor(amount, shift = 0) {
+interface CurrencyInterface {
+  plus: (any) => Currency
+}
+
+export class Currency implements CurrencyInterface {
+  _amount;
+  symbol;
+  numerator;
+  denominator;
+  shift;
+  name;
+
+  constructor(amount, shift: number | string = 0, symbol = '???') {
+    
     if (shift === 'wei') shift = -18;
     if (shift === 'ray') shift = -27;
     if (shift === 'rad') shift = -45;
-    this._amount = shift
+    const _amount = shift
       ? amountToBigNumber(amount).shiftedBy(shift)
       : amountToBigNumber(amount);
-    this.symbol = '???';
+    this._amount = _amount;
+    this.symbol = symbol;
+    this.shift = shift;
+    this.name = symbol;
   }
 
   isEqual(other) {
@@ -25,6 +40,10 @@ export class Currency {
   }
 
   toString(decimals = 2) {
+    return this._amount.toFixed(decimals);
+  }
+
+  toSymbolString(decimals = 2) {
     return `${this._amount.toFixed(decimals)} ${this.symbol}`;
   }
 
@@ -36,7 +55,7 @@ export class Currency {
     return this._amount.toNumber();
   }
 
-  toFixed(shift = 0) {
+  toFixed(shift: number|string = 0) {
     if (shift === 'wei') shift = 18;
     if (shift === 'ray') shift = 27;
     if (shift === 'rad') shift = 45;
@@ -51,7 +70,31 @@ export class Currency {
   isSameType(other) {
     return this.symbol === other.symbol;
   }
+
+  plus = bigNumberFnWrapper('plus')
+  add = bigNumberFnWrapper('add')
+  minus = bigNumberFnWrapper('minus')
+  sub = bigNumberFnWrapper('sub')
+  times = bigNumberFnWrapper('times')
+  multipliedBy = bigNumberFnWrapper('multipliedBy')
+  mul = bigNumberFnWrapper('mul')
+  div = bigNumberFnWrapper('div')
+  dividedBy = bigNumberFnWrapper('dividedBy')
+  shiftedBy = bigNumberFnWrapper('shiftedBy')
+  
+
+  isLessThan = bigNumberFnWrapper('isLessThan', true)
+  lt = bigNumberFnWrapper('lt', true)
+  isLessThanOrEqualTo = bigNumberFnWrapper('isLessThanOrEqualTo', true)
+  lte = bigNumberFnWrapper('lte', true)
+  isGreaterThan = bigNumberFnWrapper('isGreaterThan', true)
+  gt = bigNumberFnWrapper('gt', true)
+  isGreaterThanOrEqualTo = bigNumberFnWrapper('isGreaterThanOrEqualTo', true)
+  gte = bigNumberFnWrapper('gte', true)
+  eq = bigNumberFnWrapper('eq', true)
+
 }
+
 
 // FIXME: this is not exactly analogous to Currency above, because all the
 // different pairs are instances of the same class rather than subclasses in
@@ -60,7 +103,7 @@ export class Currency {
 // could either create subclasses for each ratio, or refactor Currency so it
 // also just stores its symbol in the instance rather than the subclass.
 export class CurrencyRatio extends Currency {
-  constructor(amount, numerator, denominator, shift) {
+  constructor(amount, numerator, denominator, shift?) {
     super(amount, shift);
     this.numerator = numerator;
     this.denominator = denominator;
@@ -68,21 +111,6 @@ export class CurrencyRatio extends Currency {
   }
 }
 
-const mathFunctions = [
-  ['plus', 'add'],
-  ['minus', 'sub'],
-  ['times', 'multipliedBy', 'mul'],
-  ['div', 'dividedBy'],
-  ['shiftedBy']
-];
-
-const booleanFunctions = [
-  ['isLessThan', 'lt'],
-  ['isLessThanOrEqualTo', 'lte'],
-  ['isGreaterThan', 'gt'],
-  ['isGreaterThanOrEqualTo', 'gte'],
-  ['eq']
-];
 
 function assertValidOperation(method, left, right) {
   if (!right && right !== 0) {
@@ -129,7 +157,7 @@ function bigNumberFnResult(method, left, right, value) {
 
   if (!(right instanceof Currency) || left.isSameType(right)) {
     if (left instanceof CurrencyRatio) {
-      return new left.constructor(
+      return new CurrencyRatio(
         value,
         left.numerator,
         left.denominator,
@@ -142,7 +170,7 @@ function bigNumberFnResult(method, left, right, value) {
   return new CurrencyRatio(value, left.constructor, right.constructor);
 }
 
-function bigNumberFnWrapper(method, isBoolean) {
+function bigNumberFnWrapper(method, isBoolean = false) {
   return function (other) {
     assertValidOperation(method, this, other);
 
@@ -154,20 +182,3 @@ function bigNumberFnWrapper(method, isBoolean) {
   };
 }
 
-Object.assign(
-  Currency.prototype,
-  mathFunctions.reduce((output, [method, ...aliases]) => {
-    output[method] = bigNumberFnWrapper(method);
-    for (let alias of aliases) {
-      output[alias] = output[method];
-    }
-    return output;
-  }, {}),
-  booleanFunctions.reduce((output, [method, ...aliases]) => {
-    output[method] = bigNumberFnWrapper(method, true);
-    for (let alias of aliases) {
-      output[alias] = output[method];
-    }
-    return output;
-  }, {})
-);

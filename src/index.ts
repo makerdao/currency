@@ -1,24 +1,23 @@
 import { Currency as Currency_, CurrencyRatio } from './Currency';
 export const Currency = Currency_;
 
+
+
 export function createCurrency(symbol) {
+  interface CreatorFN {
+    wei?: (amount: any) => any,
+    ray?: (amount: any) => any,
+    rad?: (amount: any) => any,
+    isInstance?: (obj: any) => boolean,
+    (amount: any, shift?: any): CurrencyX
+  }
   // This provides short syntax, e.g. ETH(6). We need a wrapper function because
   // you can't call an ES6 class consructor without `new`
-  const creatorFn = (amount, shift) => new CurrencyX(amount, shift);
+  const creatorFn: CreatorFN = (amount, shift?) => new CurrencyX(amount, shift);
 
   class CurrencyX extends Currency {
     constructor(amount, shift) {
-      super(amount, shift);
-      this.symbol = symbol;
-
-      // this.type can be used an alternative to `this.constructor` when you
-      // want to use the short syntax, e.g.:
-      //
-      //   var foo = ETH(1);
-      //   var bar = foo.type(2);
-      //   assert(foo.plus(bar).eq(ETH(3)));
-      //
-      this.type = creatorFn;
+      super(amount, shift, symbol);
     }
   }
 
@@ -34,15 +33,23 @@ export function createCurrency(symbol) {
     isInstance: obj => obj instanceof CurrencyX
   });
 
-  Object.assign(CurrencyX, { wei: creatorFn.wei, ray: creatorFn.ray });
+  Object.assign(CurrencyX, { wei: creatorFn.wei , ray: creatorFn.ray });
   return creatorFn;
 }
 
 export function createCurrencyRatio(wrappedNumerator, wrappedDenominator) {
+  interface CreatorFN {
+    wei?: (amount: any) => any,
+    ray?: (amount: any) => any,
+    rad?: (amount: any) => any,
+    isInstance?: (obj: any) => boolean,
+    (amount: any, shift?: any): CurrencyRatio
+  }
+
   const numerator = wrappedNumerator(0).constructor;
   const denominator = wrappedDenominator(0).constructor;
 
-  const creatorFn = (amount, shift) =>
+  const creatorFn: CreatorFN = (amount, shift?) =>
     new CurrencyRatio(amount, numerator, denominator, shift);
 
   const symbol = `${numerator.symbol}/${denominator.symbol}`;
