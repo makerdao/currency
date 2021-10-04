@@ -4,20 +4,32 @@ function amountToBigNumber(amount) {
   if (amount instanceof Currency || typeof amount.toBigNumber === 'function')
     return amount.toBigNumber();
 
-  const value = BigNumber(amount);
+  const value = new BigNumber(amount);
   if (value.isNaN()) throw new Error(`amount "${amount}" is not a number`);
   return value;
 }
 
-export class Currency {
-  constructor(amount, shift = 0) {
+export class Currency extends BigNumber {
+  _amount;
+  symbol;
+  numerator;
+  denominator;
+  shift;
+  name;
+
+  constructor(amount, shift: number | string = 0, symbol = '???') {
+    
     if (shift === 'wei') shift = -18;
     if (shift === 'ray') shift = -27;
     if (shift === 'rad') shift = -45;
-    this._amount = shift
+    const _amount = shift
       ? amountToBigNumber(amount).shiftedBy(shift)
       : amountToBigNumber(amount);
-    this.symbol = '???';
+    super(_amount);
+    this._amount = _amount;
+    this.symbol = symbol;
+    this.shift = shift;
+    this.name = symbol;
   }
 
   isEqual(other) {
@@ -36,7 +48,7 @@ export class Currency {
     return this._amount.toNumber();
   }
 
-  toFixed(shift = 0) {
+  toFixed(shift: number|string = 0) {
     if (shift === 'wei') shift = 18;
     if (shift === 'ray') shift = 27;
     if (shift === 'rad') shift = 45;
@@ -60,7 +72,7 @@ export class Currency {
 // could either create subclasses for each ratio, or refactor Currency so it
 // also just stores its symbol in the instance rather than the subclass.
 export class CurrencyRatio extends Currency {
-  constructor(amount, numerator, denominator, shift) {
+  constructor(amount, numerator, denominator, shift?) {
     super(amount, shift);
     this.numerator = numerator;
     this.denominator = denominator;
@@ -129,7 +141,7 @@ function bigNumberFnResult(method, left, right, value) {
 
   if (!(right instanceof Currency) || left.isSameType(right)) {
     if (left instanceof CurrencyRatio) {
-      return new left.constructor(
+      return new CurrencyRatio(
         value,
         left.numerator,
         left.denominator,
@@ -142,7 +154,7 @@ function bigNumberFnResult(method, left, right, value) {
   return new CurrencyRatio(value, left.constructor, right.constructor);
 }
 
-function bigNumberFnWrapper(method, isBoolean) {
+function bigNumberFnWrapper(method, isBoolean = false) {
   return function (other) {
     assertValidOperation(method, this, other);
 

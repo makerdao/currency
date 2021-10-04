@@ -148,6 +148,6 @@ test('instance.type = short syntax creator', () => {
 });
 
 test('constructor flexibility', () => {
-  const val = ETH({ toBigNumber: () => BigNumber(5) });
+  const val = ETH({ toBigNumber: () => new BigNumber(5) });
   expect(val.eq(5)).toBeTruthy();
 });

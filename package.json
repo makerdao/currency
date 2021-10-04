@@ -3,9 +3,15 @@
   "description": "Utilities for working with currency amounts",
   "version": "0.9.9",
   "license": "MIT",
+  "typings": "dist/index.d.ts",
   "main": "dist/index.js",
+  "unpkg": "dist/index.js",
+  "jsdelivr": "dist/dai.esm.js",
+  "module": "dist/dai.esm.js",
   "scripts": {
-    "prepublishOnly": "babel -d dist src",
+    "prepublishOnly": "build",
+    "build": "yarn clean && tsdx build",
+    "clean": "rm -rf ./dist",
     "test": "jest"
   },
   "files": [
@@ -17,15 +23,15 @@
     "test/**/*.js"
   ],
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-jest": "^22.4.3",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-stage-2": "^6.24.1",
-    "jest": "^23.6.0"
+    "jest": "^27.2.1",
+    "@types/jest": "^27.0.2",
+    "@types/node": "^16.10.1",
+    "ts-jest": "^27.0.5",
+    "ts-loader": "^9.2.6",
+    "tsdx": "^0.14.1",
+    "typescript": "^4.4.3"
   },
   "dependencies": {
-    "babel-runtime": "^6.26.0",
     "bignumber.js": "^8.1.1"
   }
 }
