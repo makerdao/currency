@@ -16,20 +16,9 @@ export function createCurrency(symbol) {
   const creatorFn: CreatorFN = (amount, shift?) => new CurrencyX(amount, shift);
 
   class CurrencyX extends Currency {
-    type;
     constructor(amount, shift) {
       super(amount, shift, symbol);
-
-      // this.type can be used an alternative to `this.constructor` when you
-      // want to use the short syntax, e.g.:
-      //
-      //   var foo = ETH(1);
-      //   var bar = foo.type(2);
-      //   assert(foo.plus(bar).eq(ETH(3)));
-      //
-      this.type = creatorFn;
     }
-
   }
 
   // this changes the name of the class in stack traces
