@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js';
 
 function amountToBigNumber(amount) {
+  if (amount._isBigNumber && amount._hex) amount = amount._hex;
   if (amount instanceof Currency || typeof amount.toBigNumber === 'function')
     return amount.toBigNumber();
 
@@ -24,8 +25,10 @@ export class Currency {
     return this._amount.eq(other._amount) && this.symbol == other.symbol;
   }
 
-  toString(decimals = 2) {
-    return `${this._amount.toFixed(decimals)} ${this.symbol}`;
+  toString(decimals = 2, symbol = true) {
+    return symbol
+      ? `${this._amount.toFixed(decimals)} ${this.symbol}`
+      : this._amount.toFixed(decimals);
   }
 
   toBigNumber() {

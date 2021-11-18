@@ -1,7 +1,7 @@
 {
   "name": "@makerdao/currency",
   "description": "Utilities for working with currency amounts",
-  "version": "0.9.9",
+  "version": "0.9.10",
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
@@ -17,6 +17,7 @@
     "test/**/*.js"
   ],
   "devDependencies": {
+    "@ethersproject/bignumber": "^5.5.0",
     "babel-cli": "^6.26.0",
     "babel-jest": "^22.4.3",
     "babel-plugin-transform-runtime": "^6.23.0",

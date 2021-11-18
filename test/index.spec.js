@@ -1,5 +1,6 @@
 import { Currency, createCurrency, createCurrencyRatio } from '../src';
 import BigNumber from 'bignumber.js';
+import { BigNumber as EthersBN } from '@ethersproject/bignumber';
 
 const DAI = createCurrency('DAI');
 const MKR = createCurrency('MKR');
@@ -39,6 +40,11 @@ test('short syntax for rad (1e45) amounts', () => {
 test('toString prints the specified number of decimals', () => {
   const n = MKR('1000.5447123');
   expect(n.toString(3)).toBe('1000.545 MKR');
+});
+
+test('toString accepts a boolean to not print symbol', () => {
+  const n = MKR('1000.5447123');
+  expect(n.toString(3, false)).toBe('1000.545');
 });
 
 test('basic math', () => {
@@ -150,4 +156,10 @@ test('instance.type = short syntax creator', () => {
 test('constructor flexibility', () => {
   const val = ETH({ toBigNumber: () => BigNumber(5) });
   expect(val.eq(5)).toBeTruthy();
+});
+
+test('can safely handle ethers bignumber (BN.js)', () => {
+  const ethersBN = EthersBN.from(555);
+  const val = ETH(ethersBN);
+  expect(val.eq(555)).toBeTruthy();
 });
